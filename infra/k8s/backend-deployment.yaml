@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitops-backend
+  namespace: gitops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitops-backend
+  template:
+    metadata:
+      labels:
+        app: gitops-backend
+    spec:
+      containers:
+        - name: backend
+          # Local Minikube: gitops-backend:local + imagePullPolicy Never
+          # GitOps / Docker Hub: <your-dockerhub-username>/gitops-backend:latest + IfNotPresent
+          image: gitops-backend:local
+          imagePullPolicy: Never
+          env:
+            - name: POSTGRES_HOST
+              value: gitops-postgres
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: gitops
+            - name: POSTGRES_PASSWORD
+              value: gitopspass
+            - name: POSTGRES_DB
+              value: gitopsdb
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /message
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /message
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitops-backend
+  namespace: gitops
+spec:
+  selector:
+    app: gitops-backend
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP

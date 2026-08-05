@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitops-frontend
+  namespace: gitops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitops-frontend
+  template:
+    metadata:
+      labels:
+        app: gitops-frontend
+    spec:
+      containers:
+        - name: frontend
+          # Local Minikube: gitops-frontend:local + imagePullPolicy Never
+          # GitOps / Docker Hub: <your-dockerhub-username>/gitops-frontend:latest + IfNotPresent
+          image: gitops-frontend:local
+          imagePullPolicy: Never
+          env:
+            - name: BACKEND_URL
+              value: http://gitops-backend:3000
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitops-frontend
+  namespace: gitops
+spec:
+  selector:
+    app: gitops-frontend
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30080
+  type: NodePort

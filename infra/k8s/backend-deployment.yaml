@@ -4,7 +4,7 @@ metadata:
   name: gitops-backend
   namespace: gitops
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: gitops-backend

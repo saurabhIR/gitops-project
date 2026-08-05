@@ -19,6 +19,9 @@ export default function Home() {
       <h1>GitOps Project</h1>
       <p>This is the Next.js frontend for the GitOps demo.</p>
       <p>It fetches the backend microservice through the internal API route.</p>
+      <p>
+        <a href="/about">About page</a>
+      </p>
 
       <div
         style={{

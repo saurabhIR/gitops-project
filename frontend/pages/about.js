@@ -11,7 +11,9 @@ export default function About() {
         App code changes need a new container image before pods show the update.
       </p>
       <p style={{ marginTop: "2rem" }}>
-        <a href="/">← Back to home</a>
+        <a href="/">← Home</a>
+        {" · "}
+        <a href="/status">Pipeline status</a>
       </p>
     </main>
   );
